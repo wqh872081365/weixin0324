@@ -1,0 +1,6 @@
+name: weixin0324
+version: 1
+
+libraries:
+- name: "django"
+  version: "1.8.3"
