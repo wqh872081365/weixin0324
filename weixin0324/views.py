@@ -11,10 +11,12 @@ import urllib, urllib2, time, hashlib
 import datetime
 
 from weixin0324.views_trans import replyCon
+from weixin0324.views_weather import replyWea
 
 TOKEN = "wangqihui0324"
 TRANS = "0"
 CHAT = "0"
+WEATHER = "0"
 
 
 @csrf_exempt
@@ -55,6 +57,7 @@ def checkSignature(request):
 def parseTxtMsg(request):
     global TRANS
     global CHAT
+    global WEATHER
 
     xmlstr = smart_str(request.body)
     xml = ET.fromstring(xmlstr)
@@ -65,21 +68,28 @@ def parseTxtMsg(request):
     Content = smart_str(xml.find('Content').text)
     MsgId = smart_str(xml.find('MsgId').text)
 
-    if TRANS == "1" and CHAT == "0":
+    if TRANS == "1" and CHAT == "0" and WEATHER == "0":
         if Content == 'exit1':
             msg = '感谢使用翻译模式，\r\n更多功能正在完善中！'
             TRANS = "0"
         else:
             msg = replyCon(Content)
 
-    elif CHAT == "1" and TRANS == "0":
+    elif CHAT == "1" and TRANS == "0" and WEATHER == "0":
         if Content == 'exit2':
             msg = '感谢使用聊天模式，\r\n更多功能正在完善中！'
             CHAT = "0"
         else:
             msg = '聊天模式正在开发中。。。'
 
-    elif CHAT == "0" and TRANS == "0":
+    elif WEATHER == "1" and TRANS == "0" and CHAT == "0":
+        if Content == 'exit3':
+            msg = '感谢使用天气查询模式，\r\n更多功能正在完善中！'
+            WEATHER = "0"
+        else:
+            msg = replyWea(Content)
+
+    elif CHAT == "0" and TRANS == "0" and WEATHER == "0":
         if Content == '1':
             msg = '请输入需要翻译的单词：'
             TRANS = "1"
@@ -88,8 +98,12 @@ def parseTxtMsg(request):
             msg = '进入聊天模式：'
             CHAT = "1"
 
+        elif Content == '3':
+            msg = '请输入需要查询的城市：'
+            WEATHER = "1"
+
         else:
-            msg = '欢迎访问动漫分享平台，\r\n本公众号正在建设中，\r\n目前提供的服务有限，\r\n输入1进入翻译模式，\r\n输入2进入聊天模式，\r\n输入exit1退出翻译模式，\r\n输入exit2退出聊天模式，\r\n任意输入将重新收到本消息。'
+            msg = '欢迎访问动漫分享平台，\r\n本公众号正在建设中，\r\n目前提供的服务有限，\r\n输入1进入翻译模式，\r\n输入2进入聊天模式，\r\n输入3进入天气查询模式，\r\n输入exit1退出翻译模式，\r\n输入exit2退出聊天模式，\r\n输入exit3退出天气查询模式，\r\n任意输入将重新收到本消息。'
 
     return sendTxtMsg(FromUserName, ToUserName, msg)
 
