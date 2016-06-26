@@ -55,9 +55,12 @@ def checkSignature(request):
 
 
 def parseTxtMsg(request):
+
     global TRANS
     global CHAT
     global WEATHER
+
+    msg = ""
 
     xmlstr = smart_str(request.body)
     xml = ET.fromstring(xmlstr)

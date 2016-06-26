@@ -2,12 +2,6 @@
 # -*- coding: utf-8 -*-
 # 天气查询功能（聚合数据-天气预报API）
 
-from django.http import HttpResponse
-from django.template import RequestContext, Template
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.encoding import smart_str, smart_unicode
-
-import xml.etree.ElementTree as ET
 import urllib, urllib2, time, hashlib
 
 import json
@@ -19,12 +13,13 @@ appkey = "a974af8894474e9cbb45bc8130206d0f"
 def paraseWeatherjson(res):
     replyContent = ''
 
-    replyContent = "%s%s%s\n" % (replyContent, res['data']['realtime']['city_name'], '天气预报')
-    replyContent = "%s%s\n" % (replyContent, res['data']['realtime']['date'])
-    replyContent = "%s%s%s\n" % (replyContent,  '天气: ', res['data']['realtime']['weather']['info'])
-    replyContent = "%s%s%s\n" % (replyContent, '温度: ', res['data']['realtime']['weather']['temperature'])
-    replyContent = "%s%s%s\n" % (replyContent, '湿度: ', res['data']['realtime']['weather']['humidity'])
-    replyContent = "%s%s%s%s\n" % (replyContent, '风速: ', res['data']['realtime']['wind']['direct'], res['data']['realtime']['wind']['power'])
+    replyContent = "%s%s%s\n" % (replyContent, res['today']['city'].encode('utf-8'), '天气预报')
+    replyContent = "%s%s\n" % (replyContent, res['today']['date_y'].encode('utf-8'))
+    replyContent = "%s%s%s\n" % (replyContent,  '天气: ', res['today']['weather'].encode('utf-8'))
+    replyContent = "%s%s%s\n" % (replyContent, '温度: ', res['today']['temperature'].encode('utf-8'))
+    replyContent = "%s%s%s\n" % (replyContent, '湿度: ', res['sk']['humidity'].encode('utf-8'))
+    replyContent = "%s%s%s" % (replyContent, '风速: ', res['today']['wind'].encode('utf-8'))
+    # print replyContent
     return replyContent
 
 
@@ -36,11 +31,12 @@ def replyWea(Content):
     m = "GET"
 
 
-    url = "http://op.juhe.cn/onebox/weather/query"
+    url = "http://v.juhe.cn/weather/index"
     params = {
         "cityname": Content,  # 要查询的城市，如：温州、上海、北京
         "key": appkey,  # 应用APPKEY(应用详细页查询)
         "dtype": "json",  # 返回数据的格式,xml或json，默认json
+        "format": "1"  # 未来6天预报(future)两种返回格式，1或2，默认1
     }
     params = urlencode(params)
     if m == "GET":
@@ -55,11 +51,13 @@ def replyWea(Content):
         if error_code == 0:
             # 成功请求
             replyWeather = paraseWeatherjson(res["result"])
-            print res["result"]
+            # print res["result"]
         else:
-            print "%s:%s" % (res["error_code"], res["reason"])
+            replyWeather = 'error code'
+            # print "%s:%s" % (res["error_code"], res["reason"])
     else:
-        print "request api error"
+        replyWeather = 'api error'
+        # print "request api error"
 
 
     # req = urllib2.Request(url=youdaoURL)
@@ -69,3 +67,10 @@ def replyWea(Content):
 
     return replyWeather
 
+
+def main():
+    replyWea("上海")
+
+
+if __name__ == '__main__':
+    main()
