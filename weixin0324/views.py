@@ -65,48 +65,74 @@ def parseTxtMsg(request):
 
     xmlstr = smart_str(request.body)
     xml = ET.fromstring(xmlstr)
-    ToUserName = smart_str(xml.find('ToUserName').text)
-    FromUserName = smart_str(xml.find('FromUserName').text)
-    CreateTime = smart_str(xml.find('CreateTime').text)
-    MsgType = smart_str(xml.find('MsgType').text)
-    Content = smart_str(xml.find('Content').text)
-    MsgId = smart_str(xml.find('MsgId').text)
 
-    if TRANS == "1" and CHAT == "0" and WEATHER == "0":
-        if Content == 'exit1':
-            msg = '感谢使用翻译模式，\r\n更多功能正在完善中！'
-            TRANS = "0"
-        else:
-            msg = replyCon(Content)
+    ToUserName = None
+    FromUserName = None
+    CreateTime = None
+    Content = None
+    MsgType = None
+    MsgId = None
+    Event = None
 
-    elif CHAT == "1" and TRANS == "0" and WEATHER == "0":
-        if Content == 'exit2':
-            msg = '感谢使用聊天模式，\r\n更多功能正在完善中！'
-            CHAT = "0"
-        else:
-            msg = replyChat(Content)
+    if xml.find('ToUserName') != None:
+        ToUserName = smart_str(xml.find('ToUserName').text)
+    if xml.find('FromUserName') != None:
+        FromUserName = smart_str(xml.find('FromUserName').text)
+    if xml.find('CreateTime') != None:
+        CreateTime = smart_str(xml.find('CreateTime').text)
+    if xml.find('MsgType') != None:
+        MsgType = smart_str(xml.find('MsgType').text)
+    if xml.find('Content') != None:
+        Content = smart_str(xml.find('Content').text)
+    if xml.find('MsgId') != None:
+        MsgId = smart_str(xml.find('MsgId').text)
 
-    elif WEATHER == "1" and TRANS == "0" and CHAT == "0":
-        if Content == 'exit3':
-            msg = '感谢使用天气查询模式，\r\n更多功能正在完善中！'
-            WEATHER = "0"
-        else:
-            msg = replyWea(Content)
+    if xml.find('Event') != None:
+        Event = smart_str(xml.find('Event').text)
 
-    elif CHAT == "0" and TRANS == "0" and WEATHER == "0":
-        if Content == '1':
-            msg = '请输入需要翻译的单词：'
-            TRANS = "1"
 
-        elif Content == '2':
-            msg = '进入聊天模式：\r\n请输入文本内容：'
-            CHAT = "1"
+    if MsgType == "text":
 
-        elif Content == '3':
-            msg = '请输入需要查询的城市：'
-            WEATHER = "1"
+        if TRANS == "1" and CHAT == "0" and WEATHER == "0":
+            if Content == 'exit1':
+                msg = '感谢使用翻译模式，\r\n更多功能正在完善中！'
+                TRANS = "0"
+            else:
+                msg = replyCon(Content)
 
-        else:
+        elif CHAT == "1" and TRANS == "0" and WEATHER == "0":
+            if Content == 'exit2':
+                msg = '感谢使用聊天模式，\r\n更多功能正在完善中！'
+                CHAT = "0"
+            else:
+                msg = replyChat(Content)
+
+        elif WEATHER == "1" and TRANS == "0" and CHAT == "0":
+            if Content == 'exit3':
+                msg = '感谢使用天气查询模式，\r\n更多功能正在完善中！'
+                WEATHER = "0"
+            else:
+                msg = replyWea(Content)
+
+        elif CHAT == "0" and TRANS == "0" and WEATHER == "0":
+            if Content == '1':
+                msg = '请输入需要翻译的单词：'
+                TRANS = "1"
+
+            elif Content == '2':
+                msg = '进入聊天模式：\r\n请输入文本内容：'
+                CHAT = "1"
+
+            elif Content == '3':
+                msg = '请输入需要查询的城市：'
+                WEATHER = "1"
+
+            else:
+                msg = '欢迎访问动漫分享平台，\r\n本公众号正在建设中，\r\n目前提供的服务有限，\r\n输入1进入翻译模式，\r\n输入2进入聊天模式，\r\n输入3进入天气查询模式，\r\n输入exit1退出翻译模式，\r\n输入exit2退出聊天模式，\r\n输入exit3退出天气查询模式，\r\n任意输入将重新收到本消息。'
+
+    elif MsgType == "event":
+
+        if Event == "subscribe":
             msg = '欢迎访问动漫分享平台，\r\n本公众号正在建设中，\r\n目前提供的服务有限，\r\n输入1进入翻译模式，\r\n输入2进入聊天模式，\r\n输入3进入天气查询模式，\r\n输入exit1退出翻译模式，\r\n输入exit2退出聊天模式，\r\n输入exit3退出天气查询模式，\r\n任意输入将重新收到本消息。'
 
     return sendTxtMsg(FromUserName, ToUserName, msg)
