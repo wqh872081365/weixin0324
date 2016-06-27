@@ -12,6 +12,7 @@ import datetime
 
 from weixin0324.views_trans import replyCon
 from weixin0324.views_weather import replyWea
+from weixin0324.views_chat import replyChat
 
 TOKEN = "wangqihui0324"
 TRANS = "0"
@@ -83,7 +84,7 @@ def parseTxtMsg(request):
             msg = '感谢使用聊天模式，\r\n更多功能正在完善中！'
             CHAT = "0"
         else:
-            msg = '聊天模式正在开发中。。。'
+            msg = replyChat(Content)
 
     elif WEATHER == "1" and TRANS == "0" and CHAT == "0":
         if Content == 'exit3':
@@ -98,7 +99,7 @@ def parseTxtMsg(request):
             TRANS = "1"
 
         elif Content == '2':
-            msg = '进入聊天模式：'
+            msg = '进入聊天模式：\r\n请输入文本内容：'
             CHAT = "1"
 
         elif Content == '3':
